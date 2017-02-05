@@ -1,3 +1,5 @@
+This is the read me file from awoodruff/neighborhoods project. This project builds on awoodruff/neighborhoods and on enam/neighborhoods to create a cognitive mapping tool. 
+
 #neighborhoods
 
 http://bostonography.com/hoods
