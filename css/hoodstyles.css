@@ -241,8 +241,8 @@ a:hover {
 #btnBar .btn{
   display: none;
 }
-#btnBar .btn#startPolyBtn, #btnBar .btn#startMarkerBtn{
-	background-color: 'white';
+#btnBar .start-btn{
+	/*background-color: 'white';*/
 	font-weight: bold;
 	border-color: #333;
   display: block;
@@ -251,9 +251,15 @@ a:hover {
   text-align: left;
 }
 
-#btnBar .btn#startMarkerBtn{
+#btnBar .btn#startBlackMarkerBtn, #btnBar .btn#startRedMarkerBtn{
   margin-top: 3px;
 }
+
+.bg-black { background-color: grey; }
+.bg-red { background-color: red; }
+.bg-blue { background-color: blue; }
+.bg-green { background-color: green; }
+
 
 svg.tracer {
     position: absolute;
