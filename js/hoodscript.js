@@ -191,25 +191,54 @@ function go(){
   });
  
  // DRAW MARKER BUTTON
-  $('#startBlackMarkerBtn').on('click',function(){
-    geomType = "point";
-    $('#deletePolyBtn').show();
-    $('#startBluePolyBtn').hide();
-    $('#startGreenPolyBtn').hide();
-    $('#submitPolyBtn').hide();
-    $('#startBlackMarkerBtn').hide();
-    marker = map.editTools.startMarker();
-    drawnItems.addLayer( marker );
-    showDrawingInstructions();
-    map.on("editable:editing",function(){
-      $(".leaflet-container").removeClass("drawing");
-      $('#submitPolyBtn').show();
-    }).on("editable:drawing:commit",function(){
-      showEditingInstructions();
-      $(".leaflet-container").removeClass("drawing");
-      $('#submitPolyBtn').show();
-    });
-  })
+  $('#startRedMarkerBtn').
+  on('click', $.proxy(onClickMarkerBtn, 
+    {
+      'buttonId' : '#startRedMarkerBtn',
+      'color' : 'red',
+      'hide' : [
+        '#startBluePolyBtn',
+        '#startGreenPolyBtn',
+        '#submitPolyBtn',
+        '#startBlackMarkerBtn'
+      ],
+      'icon' : L.icon({
+          iconUrl: 'img/leaflet-color-markers/marker-icon-red.png',
+          iconRetinaUrl: 'img/leaflet-color-markers/marker-red-2x-orange.png',
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [1, -34],
+          shadowSize: [41, 41]
+          //shadowUrl: 'my-icon-shadow.png',
+          //shadowRetinaUrl: 'my-icon-shadow@2x.png',            
+          //shadowAnchor: [22, 94]
+      })
+    }
+  ));
+  $('#startBlackMarkerBtn').
+  on('click', $.proxy(onClickMarkerBtn, 
+    {
+      'buttonId' : '#startBlackMarkerBtn',
+      'color' : 'black',
+      'hide' : [
+        '#startBluePolyBtn',
+        '#startGreenPolyBtn',
+        '#submitPolyBtn',
+        '#startRedMarkerBtn'
+      ],
+      'icon' : L.icon({
+          iconUrl: 'img/leaflet-color-markers/marker-icon-black.png',
+          iconRetinaUrl: 'img/leaflet-color-markers/marker-black-2x-orange.png',
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [1, -34],
+          shadowSize: [41, 41]
+          //shadowUrl: 'my-icon-shadow.png',
+          //shadowRetinaUrl: 'my-icon-shadow@2x.png',            
+          //shadowAnchor: [22, 94]
+      })
+    }
+  ));
   /*$('#startRedMarkerBtn').on('click',function(){
     geomType = "point";
     $('#deletePolyBtn').show();
@@ -768,6 +797,26 @@ function showAlert( title, text, imageSrc, buttonLabel ){
   m.modal('show');
 }
 
+function onClickMarkerBtn(){
+  var geomType = "point";
+  $('#deletePolyBtn').show();
+  this.hide.forEach( function( item, arrIndex, arr ) {
+    $(item).hide();  
+  });
+  var marker = map.editTools.startMarker();
+  marker.setIcon(this.icon);
+  marker._colorId = this.color;
+  drawnItems.addLayer( marker );
+  showDrawingInstructions();
+  map.on("editable:editing",function(){
+    $(".leaflet-container").removeClass("drawing");
+    $('#submitPolyBtn').show();
+  }).on("editable:drawing:commit",function(){
+    showEditingInstructions();
+    $(".leaflet-container").removeClass("drawing");
+    $('#submitPolyBtn').show();
+  });
+}
 
 /*-----------------------------------------
 ---------Hey, Listeners! Lookout behind you! |o| |<{}>| |o| 
