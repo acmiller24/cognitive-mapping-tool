@@ -137,7 +137,7 @@ function go(){
 
 // DRAW POLYGON BUTTONS
   $('#startBluePolyBtn').
-  on('click', $.proxy(onClickMarkerBtn,
+  on('click', $.proxy(onClickPolyBtn,
     {
       'buttonId' : '#startBluePolyBtn',
       'color' : 'blue',
@@ -153,7 +153,7 @@ function go(){
   ));
 
   $('#startGreenPolyBtn').
-  on('click', $.proxy(onClickMarkerBtn,
+  on('click', $.proxy(onClickPolyBtn,
     {
       'buttonId' : '#startGreenPolyBtn',
       'color' : 'blue',
