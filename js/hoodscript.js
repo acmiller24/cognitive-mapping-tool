@@ -135,38 +135,39 @@ function go(){
   });
   $("#accordion").slimScroll({ height:'100%', position: 'left', distance:0, railcolor:'#ffffff', color:'#555555'});
 
-// DRAW POLYGON BUTTON 
-  $('#startBluePolyBtn').on('click',function(){
-    geomType = "poly";
-    $('#deletePolyBtn').show();
-    $('#startBluePolyBtn').hide();
-    $('#startGreenPolyBtn').hide();
-    $('#submitPolyBtn').hide(); 
-    $('#startBlackMarkerBtn').hide();
-    $('#startRedMarkerBtn').hide();
-    drawnItems.eachLayer(function(l){
-      if ( l.setStyle ) l.setStyle({clickable:false});
-    });
-    if ( !instructed.poly ){
-      showDrawingInstructions();
-      return;
-    } 
-    freeDrawLayer = new L.FreeDraw({mode: L.FreeDraw.MODES.ALL })
-      .on( 'created', function(e){
-        var originalPoly = this.polygons[0];
-        poly = L.polygon( originalPoly.getLatLngs(), {color:'#D7217E',fillColor:'#D7217E'} );
-        map.removeLayer( originalPoly );
-        map.removeLayer(freeDrawLayer);
-        freeDrawLayer = undefined;
-        drawnItems.addLayer( poly );
-        poly.enableEdit();
-        $(".leaflet-container").removeClass("drawing");
-        $('#submitPolyBtn').show();
-        showEditingInstructions();
-      })
-    map.addLayer(freeDrawLayer);
-    $(".leaflet-container").addClass("drawing");
-  });
+// DRAW POLYGON BUTTONS
+  $('#startBluePolyBtn').
+  on('click', $.proxy(onClickMarkerBtn,
+    {
+      'buttonId' : '#startBluePolyBtn',
+      'color' : 'blue',
+      'hide' : [
+        //'#startBluePolyBtn',
+        '#startGreenPolyBtn',
+        '#submitPolyBtn',
+        '#startBlackMarkerBtn',
+        '#startRedMarkerBtn'
+      ],
+      'style' : {color:'#D7217E',fillColor:'#D7217E'}
+    }
+  ));
+
+  $('#startGreenPolyBtn').
+  on('click', $.proxy(onClickMarkerBtn,
+    {
+      'buttonId' : '#startGreenPolyBtn',
+      'color' : 'blue',
+      'hide' : [
+        '#startBluePolyBtn',
+        //'#startGreenPolyBtn',
+        '#submitPolyBtn',
+        '#startBlackMarkerBtn',
+        '#startRedMarkerBtn'
+      ],
+      'style' : {color:'#D7217E',fillColor:'#D7217E'}
+    }
+  ));
+
   $('#deletePolyBtn').on('click',function(){
     if ( poly ) drawnItems.removeLayer( poly );
     if ( marker ) drawnItems.removeLayer( marker );
@@ -190,7 +191,7 @@ function go(){
      map.off("editable:editing").off("editable:drawing:commit");
   });
  
- // DRAW MARKER BUTTON
+ // DRAW MARKER BUTTONS
   $('#startRedMarkerBtn').
   on('click', $.proxy(onClickMarkerBtn, 
     {
@@ -239,25 +240,7 @@ function go(){
       })
     }
   ));
-  /*$('#startRedMarkerBtn').on('click',function(){
-    geomType = "point";
-    $('#deletePolyBtn').show();
-    $('#startBluePolyBtn').hide();
-    $('#startGreenPolyBtn').hide();
-    $('#submitPolyBtn').hide();
-    $('#startRedMarkerBtn').hide();
-    marker = map.editTools.startMarker();
-    drawnItems.addLayer( marker );
-    showDrawingInstructions();
-    map.on("editable:editing",function(){
-      $(".leaflet-container").removeClass("drawing");
-      $('#submitPolyBtn').show();
-    }).on("editable:drawing:commit",function(){
-      showEditingInstructions();
-      $(".leaflet-container").removeClass("drawing");
-      $('#submitPolyBtn').show();
-    });
-  })*/
+  
   $("#submitPolyBtn").click(function(e){
   //CHECK IF POLYGON IS COMPLETE
    // if(drawnItems.getLayers().length<1){bootstrap_alert.warning('Oops, you need to map a neighborhood first.'); }
@@ -817,6 +800,48 @@ function onClickMarkerBtn(){
     $('#submitPolyBtn').show();
   });
 }
+
+function onClickPolyBtn(){
+  geomType = "poly";
+  $('#deletePolyBtn').show();
+  this.hide.forEach( function( item, arrIndex, arr ) {
+    $(item).hide();  
+  });
+  drawnItems.eachLayer(function(l){
+    if ( l.setStyle ) l.setStyle({clickable:false});
+  });
+  if ( !instructed.poly ){
+    showDrawingInstructions();
+    return;
+  } 
+  freeDrawLayer = new L.FreeDraw({mode: L.FreeDraw.MODES.ALL , polyStyle: this.style })
+    .on( 'created', function(e){
+      var originalPoly = this.polygons[0];
+      poly = L.polygon( originalPoly.getLatLngs(), this.options.polyStyle );
+      map.removeLayer( originalPoly );
+      map.removeLayer(freeDrawLayer);
+      freeDrawLayer = undefined;
+      drawnItems.addLayer( poly );
+      poly.enableEdit();
+      $(".leaflet-container").removeClass("drawing");
+      $('#submitPolyBtn').show();
+      showEditingInstructions();
+    })
+  map.addLayer(freeDrawLayer);
+  $(".leaflet-container").addClass("drawing");
+}
+    {
+      'buttonId' : '#startBluePolyBtn',
+      'color' : 'blue',
+      'hide' : [
+        //'#startBluePolyBtn',
+        '#startGreenPolyBtn',
+        '#submitPolyBtn',
+        '#startBlackMarkerBtn',
+        '#startRedMarkerBtn'
+      ],
+      'style' : {color:'#D7217E',fillColor:'#D7217E'}
+    }
 
 /*-----------------------------------------
 ---------Hey, Listeners! Lookout behind you! |o| |<{}>| |o| 
