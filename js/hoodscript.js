@@ -4,13 +4,13 @@
 var myCities = [  //NAME AND BOUNDS OF CITIES 
   {name:"Boston",bnds:[[42.195649,-71.285258],[42.550992,-70.836535]]}
 ]
-,tblName = "cm_input" // cartoDB table name
-,usrName = "acmiller24" // your cartoDB username
+,tblName = "neighborhoods" // cartoDB table name
+,usrName = "telegul" // your cartoDB username
 ,brandText = "Cognitive Mapping BETA" // top left text and link on site
 ,brandLink = "http://mit.edu" //top left link on site
 ,giturl = "https://github.com/enam/neighborhoods" //Only change this if you want to link to a fork you made, otherwise you can leave the link to the original repo
 ,twiturl = "https://twitter.com/andrewmiller802" //Links to my twit acct, change it if you want or remove twitter link altogether
-,myPath = "http://acmiller24.cartodb.com/api/v2"; //this is the root path to your cartoDB instance with the v2 api param
+,myPath = "http://telegul.cartodb.com/api/v2"; //this is the root path to your cartoDB instance with the v2 api param
 
 /*---------------------------
 ----- Application Vars -------------
@@ -74,7 +74,7 @@ function go(){
     zoomControl:false,
     center: [0,0], 
     zoom: 14,
-    editable: false,
+    editable: true,
     dragging: false,
     maxZoom: 14,
     minZoom: 14
@@ -136,12 +136,14 @@ function go(){
   $("#accordion").slimScroll({ height:'100%', position: 'left', distance:0, railcolor:'#ffffff', color:'#555555'});
 
 // DRAW POLYGON BUTTON 
-  $('#startPolyBtn').on('click',function(){
+  $('#startBluePolyBtn').on('click',function(){
     geomType = "poly";
     $('#deletePolyBtn').show();
-    $('#startPolyBtn').hide();
+    $('#startBluePolyBtn').hide();
+    $('#startGreenPolyBtn').hide();
     $('#submitPolyBtn').hide(); 
-    $('#startMarkerBtn').hide();
+    $('#startBlackMarkerBtn').hide();
+    $('#startRedMarkerBtn').hide();
     drawnItems.eachLayer(function(l){
       if ( l.setStyle ) l.setStyle({clickable:false});
     });
@@ -177,8 +179,10 @@ function go(){
       $(".leaflet-container").removeClass("drawing");
     }
     $('#submitPolyBtn').hide();
-    $('#startPolyBtn').show();
-    $('#startMarkerBtn').show();
+    $('#startBluePolyBtn').show();
+    $('#startGreenPolyBtn').show();
+    $('#startBlackMarkerBtn').show();
+    $('#startRedMarkerBtn').show();
     $('#deletePolyBtn').hide();
     drawnItems.eachLayer(function(l){
       if ( l.setStyle ) l.setStyle({clickable:false});
@@ -187,12 +191,13 @@ function go(){
   });
  
  // DRAW MARKER BUTTON
-  $('#startMarkerBtn').on('click',function(){
+  $('#startBlackMarkerBtn').on('click',function(){
     geomType = "point";
     $('#deletePolyBtn').show();
-    $('#startPolyBtn').hide();
+    $('#startBluePolyBtn').hide();
+    $('#startGreenPolyBtn').hide();
     $('#submitPolyBtn').hide();
-    $('#startMarkerBtn').hide();
+    $('#startBlackMarkerBtn').hide();
     marker = map.editTools.startMarker();
     drawnItems.addLayer( marker );
     showDrawingInstructions();
@@ -205,6 +210,25 @@ function go(){
       $('#submitPolyBtn').show();
     });
   })
+  /*$('#startRedMarkerBtn').on('click',function(){
+    geomType = "point";
+    $('#deletePolyBtn').show();
+    $('#startBluePolyBtn').hide();
+    $('#startGreenPolyBtn').hide();
+    $('#submitPolyBtn').hide();
+    $('#startRedMarkerBtn').hide();
+    marker = map.editTools.startMarker();
+    drawnItems.addLayer( marker );
+    showDrawingInstructions();
+    map.on("editable:editing",function(){
+      $(".leaflet-container").removeClass("drawing");
+      $('#submitPolyBtn').show();
+    }).on("editable:drawing:commit",function(){
+      showEditingInstructions();
+      $(".leaflet-container").removeClass("drawing");
+      $('#submitPolyBtn').show();
+    });
+  })*/
   $("#submitPolyBtn").click(function(e){
   //CHECK IF POLYGON IS COMPLETE
    // if(drawnItems.getLayers().length<1){bootstrap_alert.warning('Oops, you need to map a neighborhood first.'); }
@@ -241,8 +265,10 @@ function go(){
     document.getElementById('cityName').value= '';
     $('#deletePolyBtn').hide();
     $('#submitPolyBtn').hide();
-    $('#startPolyBtn').show();
-    $('#startMarkerBtn').show();
+    $('#startBluePolyBtn').show();
+    $('#startGreenPolyBtn').show();
+    $('#startBlackMarkerBtn').show();
+    $('#startRedMarkerBtn').show();
     $("#submitModal").modal('hide');
     $(".cty-group > button.btn").removeClass('active');
     $(".nbr-group > button.btn").removeClass('active');
@@ -645,8 +671,10 @@ var goMakeState = function(){
 
   clearSomeHoods(highlightCount);
   $('#deletePolyBtn').hide();
-  $('#startPolyBtn').show();
-  $('#startMarkerBtn').show();
+  $('#startBluePolyBtn').show();
+  $('#startGreenPolyBtn').show();
+  $('#startBlackMarkerBtn').show();
+  $('#startRedMarkerBtn').show();
   $('#submitPolyBtn').hide();
 
   if ( !instructed ) showInstructions();
