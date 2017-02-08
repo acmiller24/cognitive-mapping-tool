@@ -148,7 +148,7 @@ function go(){
         '#startBlackMarkerBtn',
         '#startRedMarkerBtn'
       ],
-      'style' : {color:'#D7217E',fillColor:'#D7217E'}
+      'style' : {color:'blue',fillColor:'aqua'}
     }
   ));
 
@@ -156,7 +156,7 @@ function go(){
   on('click', $.proxy(onClickPolyBtn,
     {
       'buttonId' : '#startGreenPolyBtn',
-      'color' : 'blue',
+      'color' : 'green',
       'hide' : [
         '#startBluePolyBtn',
         //'#startGreenPolyBtn',
@@ -164,7 +164,7 @@ function go(){
         '#startBlackMarkerBtn',
         '#startRedMarkerBtn'
       ],
-      'style' : {color:'#D7217E',fillColor:'#D7217E'}
+      'style' : {color:'green',fillColor:'cyan'}
     }
   ));
 
@@ -711,25 +711,7 @@ function showDrawingInstructions(){
       text = action + ' to draw the shape of the neighborhood. You won\'t be able to move the map while drawing, but don\'t worry, you can make changes after you finish.',
       src = 'img/instructions2_poly.gif';
     showAlert( title, text, src );
-    function enableDrawing(){
-      freeDrawLayer = new L.FreeDraw({mode: L.FreeDraw.MODES.ALL })
-        .on( 'created', function(e){
-          var originalPoly = this.polygons[0];
-          poly = L.polygon( originalPoly.getLatLngs(), {color:'#D7217E',fillColor:'#D7217E'} );
-          map.removeLayer( originalPoly );
-          map.removeLayer(freeDrawLayer);
-          freeDrawLayer = undefined;
-          drawnItems.addLayer( poly );
-          poly.enableEdit();
-          $(".leaflet-container").removeClass("drawing");
-          $('#submitPolyBtn').show();
-          showEditingInstructions();
-        })
-      map.addLayer(freeDrawLayer);
-      $(".leaflet-container").addClass("drawing");
-      $('#generalModal').off('hide.bs.modal',enableDrawing)
-    }
-    $('#generalModal').on('hide.bs.modal',enableDrawing)
+    //$('#generalModal').on('hide.bs.modal',enableDrawing)
   } else {
     var action = L.Browser.touch ? 'Drag your finger' : 'Click and drag your mouse';
     var title = 'Now place the marker',
@@ -812,12 +794,17 @@ function onClickPolyBtn(){
   });
   if ( !instructed.poly ){
     showDrawingInstructions();
-    return;
-  } 
-  freeDrawLayer = new L.FreeDraw({mode: L.FreeDraw.MODES.ALL , polyStyle: this.style })
+    //return;
+  }
+  enablePolyDrawing(this.style, this.color);
+}
+
+function enablePolyDrawing(polyStyle, colorId){
+  freeDrawLayer = new L.FreeDraw({mode: L.FreeDraw.MODES.ALL, 'polyStyle' : polyStyle, 'colorId' : colorId})
     .on( 'created', function(e){
       var originalPoly = this.polygons[0];
       poly = L.polygon( originalPoly.getLatLngs(), this.options.polyStyle );
+      poly._colorId = this.options.colorId;
       map.removeLayer( originalPoly );
       map.removeLayer(freeDrawLayer);
       freeDrawLayer = undefined;
@@ -827,21 +814,11 @@ function onClickPolyBtn(){
       $('#submitPolyBtn').show();
       showEditingInstructions();
     })
+  L.extend(freeDrawLayer.options, { 'polyStyle' : polyStyle, 'colorId' : colorId });
   map.addLayer(freeDrawLayer);
   $(".leaflet-container").addClass("drawing");
+  //$('#generalModal').off('hide.bs.modal',enableDrawing)
 }
-    {
-      'buttonId' : '#startBluePolyBtn',
-      'color' : 'blue',
-      'hide' : [
-        //'#startBluePolyBtn',
-        '#startGreenPolyBtn',
-        '#submitPolyBtn',
-        '#startBlackMarkerBtn',
-        '#startRedMarkerBtn'
-      ],
-      'style' : {color:'#D7217E',fillColor:'#D7217E'}
-    }
 
 /*-----------------------------------------
 ---------Hey, Listeners! Lookout behind you! |o| |<{}>| |o| 
