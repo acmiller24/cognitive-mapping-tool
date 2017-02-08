@@ -60,7 +60,10 @@ var selectedCity = myCities[0]//selected city defaults to first myCities city.
 //  attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 // });
 
-,instructed={};
+,instructed={}
+,isShowingEditingInstructions=false
+,isShowingDrawingInstructions=false
+,isShowingInstructions=false;
 
 /*---------------------------
 ----- $(window).load -------
@@ -696,7 +699,7 @@ var goMakeState = function(){
 ---------UI helper stuff
 -------------------------------------------*/
 function showInstructions(){
-  if ( instructed.poly && instructed.point ) return;
+  if ( instructed.poly && instructed.point && isShowingInstructions) return;
   var action = L.Browser.touch ? 'tap' : 'click';
   var title = 'Draw your first neighborhood!',
     text = 'To get started, zoom to your area of interest, then ' + action + ' the <b>neighborhood SHAPE</b> or <b>neighborhood POINT</b> button.',
@@ -704,7 +707,7 @@ function showInstructions(){
   showAlert( title, text, src );
 }
 function showDrawingInstructions(){
-  if ( instructed[geomType] ) return;
+  if ( instructed[geomType] && isShowingDrawingInstructions) return;
   if ( geomType == "poly" ){
     var action = L.Browser.touch ? 'Drag your finger' : 'Click and drag your mouse';
     var title = 'Now trace the neighborhood',
@@ -724,7 +727,7 @@ function showDrawingInstructions(){
   
 }
 function showEditingInstructions(){
-  if ( instructed[geomType] ) return;
+  if ( instructed[geomType] && isShowingEditingInstructions) return;
   instructed[geomType] = true;
   if ( geomType == "poly" ){
     var action = L.Browser.touch ? 'tap' : 'click';
@@ -800,7 +803,7 @@ function onClickPolyBtn(){
 }
 
 function enablePolyDrawing(polyStyle, colorId){
-  freeDrawLayer = new L.FreeDraw({mode: L.FreeDraw.MODES.ALL, 'polyStyle' : polyStyle, 'colorId' : colorId})
+  freeDrawLayer = new L.FreeDraw({mode: L.FreeDraw.MODES.ALL)
     .on( 'created', function(e){
       var originalPoly = this.polygons[0];
       poly = L.polygon( originalPoly.getLatLngs(), this.options.polyStyle );
