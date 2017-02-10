@@ -145,11 +145,11 @@ function go(){
       'buttonId' : '#startBluePolyBtn',
       'color' : 'blue',
       'hide' : [
-        //'#startBluePolyBtn',
-        '#startGreenPolyBtn',
-        '#submitPolyBtn',
-        '#startBlackMarkerBtn',
-        '#startRedMarkerBtn'
+        ////'#startBluePolyBtn',
+        //'#startGreenPolyBtn',
+        //'#submitPolyBtn',
+        //'#startBlackMarkerBtn',
+        //'#startRedMarkerBtn'
       ],
       'style' : {color:'blue',fillColor:'aqua'}
     }
@@ -161,37 +161,26 @@ function go(){
       'buttonId' : '#startGreenPolyBtn',
       'color' : 'green',
       'hide' : [
-        '#startBluePolyBtn',
-        //'#startGreenPolyBtn',
-        '#submitPolyBtn',
-        '#startBlackMarkerBtn',
-        '#startRedMarkerBtn'
+        //'#startBluePolyBtn',
+        ////'#startGreenPolyBtn',
+        //'#submitPolyBtn',
+        //'#startBlackMarkerBtn',
+        //'#startRedMarkerBtn'
       ],
       'style' : {color:'green',fillColor:'cyan'}
     }
   ));
 
   $('#deletePolyBtn').on('click',function(){
-    if ( poly ) drawnItems.removeLayer( poly );
-    if ( marker ) drawnItems.removeLayer( marker );
-    poly = undefined;
-    marker = undefined;
     if ( freeDrawLayer ){
       map.removeLayer(freeDrawLayer);
       freeDrawLayer = undefined;
       map.dragging.enable();
       $(".leaflet-container").removeClass("drawing");
     }
-    $('#submitPolyBtn').hide();
-    $('#startBluePolyBtn').show();
-    $('#startGreenPolyBtn').show();
-    $('#startBlackMarkerBtn').show();
-    $('#startRedMarkerBtn').show();
-    $('#deletePolyBtn').hide();
-    drawnItems.eachLayer(function(l){
-      if ( l.setStyle ) l.setStyle({clickable:false});
-    });
-     map.off("editable:editing").off("editable:drawing:commit");
+    getRidOfDrawnItems();
+    updateUIVisibility();
+    //map.off("editable:editing").off("editable:drawing:commit");
   });
  
  // DRAW MARKER BUTTONS
@@ -201,10 +190,10 @@ function go(){
       'buttonId' : '#startRedMarkerBtn',
       'color' : 'red',
       'hide' : [
-        '#startBluePolyBtn',
-        '#startGreenPolyBtn',
-        '#submitPolyBtn',
-        '#startBlackMarkerBtn'
+        //'#startBluePolyBtn',
+        //'#startGreenPolyBtn',
+        //'#submitPolyBtn',
+        //'#startBlackMarkerBtn'
       ],
       'icon' : L.icon({
           iconUrl: 'img/leaflet-color-markers/marker-icon-red.png',
@@ -225,10 +214,10 @@ function go(){
       'buttonId' : '#startBlackMarkerBtn',
       'color' : 'black',
       'hide' : [
-        '#startBluePolyBtn',
-        '#startGreenPolyBtn',
-        '#submitPolyBtn',
-        '#startRedMarkerBtn'
+        //'#startBluePolyBtn',
+        //'#startGreenPolyBtn',
+        //'#submitPolyBtn',
+        //'#startRedMarkerBtn'
       ],
       'icon' : L.icon({
           iconUrl: 'img/leaflet-color-markers/marker-icon-black.png',
@@ -278,60 +267,25 @@ function go(){
     document.getElementById('neighborhoodName').value = '';
     document.getElementById('neighborhoodDescription').value= '';
     document.getElementById('cityName').value= '';
-    $('#deletePolyBtn').hide();
+    /*$('#deletePolyBtn').hide();
     $('#submitPolyBtn').hide();
     $('#startBluePolyBtn').show();
     $('#startGreenPolyBtn').show();
     $('#startBlackMarkerBtn').show();
     $('#startRedMarkerBtn').show();
-    $("#submitModal").modal('hide');
+    $("#submitModal").modal('hide');*/
     $(".cty-group > button.btn").removeClass('active');
     $(".nbr-group > button.btn").removeClass('active');
     $('.typeahead').unbind();
 
-    var tableExt = "",
-      coords = ""
-    if ( poly ){
-      var a = poly.getLatLngs();
-      console.log('latlng Arr: length: '+a.length+ " " +a);
-        for (var i = 0; i < a.length; i++) {
-          var lat = (a[i].lat);//.toFixed(4); // rid of rounding that was there for url length issue during dev
-          var lng = (a[i].lng);//.toFixed(4); // rid of rounding that was there for url length issue during dev
-          coords += '['+lng + ',' + lat+'],';
-        if(i==a.length-1){
-          var lat = (a[0].lat).toFixed(4);
-            var lng = (a[0].lng).toFixed(4);
-          coords += '['+lng + ',' + lat+']';
-        }
-      }
-      poly
-        .setStyle({color:'#03f',fillColor:'#03f',weight:2,fillOpacity:.1})
-        .bindPopup( currentNeighborhood )
-        .disableEdit();
-      poly = undefined;
-    } else {
-      tableExt = "_point"
-      coords = '[' + marker.getLatLng().lng + ',' + marker.getLatLng().lat + ']';
-      marker.bindPopup( currentNeighborhood )
-        .disableEdit();
-      marker = undefined;
-      map.off("editable:editing").off("editable:drawing:commit");
-    }
+    //insertDataThroughPhp();
+    insertDataDirectly();
     
-    postData( "php/add.php",{
-      ext: tableExt,
-      coords: coords,
-      city: currentCity,
-      description: (currentDescription.replace(/'/g,"''")).replace(/"/g,"''"),
-      name: (currentNeighborhood.replace(/'/g,"''")).replace(/"/g,"''"),
-      cityYears: cityYears,
-      hoodYears: nbrhdYears
-    });
-    
-    drawnItems.eachLayer(function(l){
+    /*drawnItems.eachLayer(function(l){
       if ( l.setStyle ) l.setStyle({clickable:false});
-    });
-
+    });*/
+    
+    getRidOfDrawnItems();
     showAlert("Done!","Your neighborhood has been added! Draw more neighborhoods, or take a look at what has been added so far by clicking 'View Maps'.");
   });
   $(".enableTooltipsLeft").tooltip({container:"body",placement:"left"});
@@ -339,11 +293,145 @@ function go(){
     if(window.location.hash.substr(1)==="view"){
       $('#resultMapBtn').addClass('active');
       $('#makeMapModeBtn').removeClass('active');
-      goViewState();
+      //goViewState();
     }
   } else {
     // Fragment doesn't exist so, what are ya gonna do?
   }
+  map.on("editable:editing",function(event){
+    $(".leaflet-container").removeClass("drawing");
+    //$('#submitPolyBtn').show();
+    updateUIVisibility();
+  }).on("editable:drawing:commit",function(event){    
+    showEditingInstructions();
+    if (event.layer instanceof L.Marker) {
+      drawnItems.addLayer( event.layer );
+      //map.editTools.featuresLayer.removeLayer( event.layer );
+    }
+    $(".leaflet-container").removeClass("drawing");
+    //$('#submitPolyBtn').show();
+    updateUIVisibility();
+  });
+}
+
+function insertDataThroughPhp() {
+  postData( "php/add.php",{
+    ext: tableExt,
+    coords: coords,
+    city: currentCity,
+    description: (currentDescription.replace(/'/g,"''")).replace(/"/g,"''"),
+    name: (currentNeighborhood.replace(/'/g,"''")).replace(/"/g,"''"),
+    cityYears: cityYears,
+    hoodYears: nbrhdYears
+  });
+}
+
+function insertDataDirectly() {
+  var separatedFeatures = separateDrawnItems();
+  var url = 'https://' + usrName + '.carto.com/api/v2/sql';
+  var api_key = '53a689c5c6b10eecd583caeaa5f7b212c436e9b8';
+
+  var city = currentCity,
+      description = (currentDescription.replace(/'/g,"''")).replace(/"/g,"''"),
+      name = (currentNeighborhood.replace(/'/g,"''")).replace(/"/g,"''"),
+      cityYears = cityYears,
+      hoodYears = nbrhdYears;
+  //q=INSERT INTO test_table (column_name, column_name_2, the_geom) VALUES ('this is a string', 11, ST_SetSRID(ST_Point(-110, 43),4326))&api_key={api_key}
+  //sql
+  //cartodb_id,the_geom,flag,nbrhd_yrs,city_yrs,city,description,name,loved,updated_at,created_at
+  
+  var tableName = tblName + '_point';
+  for (i=0, arrLen = separatedFeatures.markers.length; i < arrLen; i++) {
+    var marker = separatedFeatures.markers[i]/*,
+        coords = "ST_SetSRID(ST_GeomFromGeoJSON('"
+          + '{"type":"Point","coordinates":' 
+          + '[' + marker.getLatLng().lng + ',' + marker.getLatLng().lat + ']'
+          + "}'" + "),4326)'";*/
+    $.post(
+      url,
+      { 
+        'q' : buildCartoDBQuery(
+                tableName,
+                '{"type":"Point","coordinates":' + '[' + marker.getLatLng().lng + ',' + marker.getLatLng().lat + ']' + '}',
+                city, description, name, cityYears, hoodYears, 
+                marker._colorId
+              ), 
+        'api_key' : api_key 
+      }, 
+      function(d) {
+        console.log(d);
+      }
+    );
+  }
+
+  var tableName = tblName;
+  for (i=0, arrLen = separatedFeatures.polygons.length; i < arrLen; i++) {
+    var poly = separatedFeatures.polygons[i],
+        latLngs = poly.getLatLngs();
+        coordsArr = [];
+    for (var j = 0; j < latLngs.length; j++) {
+      var lat = (latLngs[i].lat);//.toFixed(4); // rid of rounding that was there for url length issue during dev
+      var lng = (latLngs[i].lng);//.toFixed(4); // rid of rounding that was there for url length issue during dev
+      coordsArr.push('['+lng + ',' + lat+']');
+    }
+    var coords = coordsArr.join(',');
+    $.post(
+      url,
+      { 
+        'q' : buildCartoDBQuery(
+                tableName,
+                '{"type":"MultiPolygon","coordinates":[[[' + coords + ']]]}',
+                city, description, name, cityYears, hoodYears, 
+                poly._colorId
+              ), 
+        'api_key' : api_key 
+      }, 
+      function(d) {
+        console.log(d);
+      }
+    );
+  }
+}
+
+//q=INSERT INTO test_table (column_name, column_name_2, the_geom) VALUES ('this is a string', 11, ST_SetSRID(ST_Point(-110, 43),4326))&api_key={api_key}
+function buildCartoDBQuery(tableName, the_geom, city, description, name, cityYears, hoodYears, colorId, flag,loved) {
+  var resArray = ['INSERT INTO '];
+
+  resArray.push( tableName );
+  resArray.push( ' (the_geom, city, description, name, city_yrs, nbrhd_yrs, color_id, flag, loved)' );
+  resArray.push( ' VALUES (' );
+  resArray.push( "ST_SetSRID(ST_GeomFromGeoJSON('" + the_geom + "'),4326)" );
+  resArray.push( ",'");
+  resArray.push( city );
+  resArray.push( "','");
+  resArray.push( description );
+  resArray.push( "','");
+  resArray.push( name );
+  resArray.push( "','");
+  resArray.push( cityYears );
+  resArray.push( "','");
+  resArray.push( hoodYears );
+  resArray.push( "','");
+  resArray.push( colorId );
+  resArray.push( "','");  
+  resArray.push( "false','0')" );
+  //resArray.push( ')' );
+  
+  return resArray.join('');
+}
+
+function separateDrawnItems() {
+  var sortedFeatures = { 'markers' : [], 'polygons' : [] };
+  drawnItems.getLayers().forEach( function( item, arrIndex, arr ) {
+    if (item instanceof L.Marker) {
+      this.markers.push(item);
+    } else if (item instanceof L.Path) {
+      this.polygons.push(item);
+    } else {
+      console.log('Incorrect type of feature', item);
+    }
+  }, sortedFeatures);
+  return sortedFeatures;
 }
 
 /*---------------------------
@@ -699,7 +787,7 @@ var goMakeState = function(){
 ---------UI helper stuff
 -------------------------------------------*/
 function showInstructions(){
-  if ( instructed.poly && instructed.point && isShowingInstructions) return;
+  if ( (instructed.poly && instructed.point) || !isShowingInstructions) return;
   var action = L.Browser.touch ? 'tap' : 'click';
   var title = 'Draw your first neighborhood!',
     text = 'To get started, zoom to your area of interest, then ' + action + ' the <b>neighborhood SHAPE</b> or <b>neighborhood POINT</b> button.',
@@ -707,7 +795,7 @@ function showInstructions(){
   showAlert( title, text, src );
 }
 function showDrawingInstructions(){
-  if ( instructed[geomType] && isShowingDrawingInstructions) return;
+  if ( instructed[geomType] || !isShowingDrawingInstructions) return;
   if ( geomType == "poly" ){
     var action = L.Browser.touch ? 'Drag your finger' : 'Click and drag your mouse';
     var title = 'Now trace the neighborhood',
@@ -727,7 +815,7 @@ function showDrawingInstructions(){
   
 }
 function showEditingInstructions(){
-  if ( instructed[geomType] && isShowingEditingInstructions) return;
+  if ( instructed[geomType] || !isShowingEditingInstructions) return;
   instructed[geomType] = true;
   if ( geomType == "poly" ){
     var action = L.Browser.touch ? 'tap' : 'click';
@@ -767,28 +855,21 @@ function showAlert( title, text, imageSrc, buttonLabel ){
 
 function onClickMarkerBtn(){
   var geomType = "point";
-  $('#deletePolyBtn').show();
+  //$('#deletePolyBtn').show();
   this.hide.forEach( function( item, arrIndex, arr ) {
     $(item).hide();  
   });
   var marker = map.editTools.startMarker();
   marker.setIcon(this.icon);
   marker._colorId = this.color;
-  drawnItems.addLayer( marker );
-  showDrawingInstructions();
-  map.on("editable:editing",function(){
-    $(".leaflet-container").removeClass("drawing");
-    $('#submitPolyBtn').show();
-  }).on("editable:drawing:commit",function(){
-    showEditingInstructions();
-    $(".leaflet-container").removeClass("drawing");
-    $('#submitPolyBtn').show();
-  });
+  //drawnItems.addLayer( marker );
+  showDrawingInstructions();  
+  //updateUIVisibility();
 }
 
 function onClickPolyBtn(){
   geomType = "poly";
-  $('#deletePolyBtn').show();
+  //$('#deletePolyBtn').show();
   this.hide.forEach( function( item, arrIndex, arr ) {
     $(item).hide();  
   });
@@ -803,7 +884,7 @@ function onClickPolyBtn(){
 }
 
 function enablePolyDrawing(polyStyle, colorId){
-  freeDrawLayer = new L.FreeDraw({mode: L.FreeDraw.MODES.ALL)
+  freeDrawLayer = new L.FreeDraw({mode: L.FreeDraw.MODES.ALL})
     .on( 'created', function(e){
       var originalPoly = this.polygons[0];
       poly = L.polygon( originalPoly.getLatLngs(), this.options.polyStyle );
@@ -814,13 +895,35 @@ function enablePolyDrawing(polyStyle, colorId){
       drawnItems.addLayer( poly );
       poly.enableEdit();
       $(".leaflet-container").removeClass("drawing");
-      $('#submitPolyBtn').show();
+      //$('#submitPolyBtn').show();
       showEditingInstructions();
+      updateUIVisibility();
     })
   L.extend(freeDrawLayer.options, { 'polyStyle' : polyStyle, 'colorId' : colorId });
   map.addLayer(freeDrawLayer);
   $(".leaflet-container").addClass("drawing");
   //$('#generalModal').off('hide.bs.modal',enableDrawing)
+}
+
+function isDrawingEnabled() {
+  return (drawnItems.getLayers().length > 0)
+  //return (map.editTools.featuresLayer.lenght + map.editTools. > 0)
+}
+
+function getRidOfDrawnItems() {
+  drawnItems.clearLayers();
+  map.editTools.stopDrawing();
+  map.editTools.featuresLayer.clearLayers();
+}
+
+function updateUIVisibility() {
+  if (isDrawingEnabled()) {
+    $('#deletePolyBtn').show();
+    $('#submitPolyBtn').show();
+  } else {
+    $('#deletePolyBtn').hide();
+    $('#submitPolyBtn').hide();
+  }
 }
 
 /*-----------------------------------------
