@@ -63,7 +63,8 @@ var selectedCity = myCities[0]//selected city defaults to first myCities city.
 ,instructed={}
 ,isShowingEditingInstructions=false
 ,isShowingDrawingInstructions=false
-,isShowingInstructions=false;
+,isShowingInstructions=false
+,editModeActivated=false;
 
 /*---------------------------
 ----- $(window).load -------
@@ -196,6 +197,7 @@ function go(){
       $(".leaflet-container").removeClass("drawing");
     }
     getRidOfDrawnItems();
+    editModeActivated = false;
     updateUIVisibility();
     //map.off("editable:editing").off("editable:drawing:commit");
   });
@@ -302,6 +304,7 @@ function go(){
       if ( l.setStyle ) l.setStyle({clickable:false});
     });*/
     
+    editModeActivated = false;
     getRidOfDrawnItems();
     showAlert("Done!","Your neighborhood has been added! Draw more neighborhoods, or take a look at what has been added so far by clicking 'View Maps'.");
   });
@@ -880,6 +883,7 @@ function onClickMarkerBtn(){
   var marker = map.editTools.startMarker();
   marker.setIcon(this.icon);
   marker._colorId = this.color;
+  editModeActivated = true;
   //drawnItems.addLayer( marker );
   showDrawingInstructions();  
   //updateUIVisibility();
@@ -902,6 +906,7 @@ function onClickPolyBtn(){
 }
 
 function enablePolyDrawing(polyStyle, colorId){
+  editModeActivated = true;
   freeDrawLayer = new L.FreeDraw({mode: L.FreeDraw.MODES.ALL})
     .on( 'created', function(e){
       var originalPoly = this.polygons[0];
@@ -924,7 +929,7 @@ function enablePolyDrawing(polyStyle, colorId){
 }
 
 function isDrawingEnabled() {
-  return (drawnItems.getLayers().length > 0)
+  return (editModeActivated || drawnItems.getLayers().length > 0)
   //return (map.editTools.featuresLayer.lenght + map.editTools. > 0)
 }
 
