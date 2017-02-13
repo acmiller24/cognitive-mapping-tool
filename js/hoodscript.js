@@ -171,6 +171,23 @@ function go(){
     }
   ));
 
+  //
+  $('#startGreyPolyBtn').
+  on('click', $.proxy(onClickPolyBtn,
+    {
+      'buttonId' : '#startGreyPolyBtn',
+      'color' : 'grey',
+      'hide' : [
+        //'#startBluePolyBtn',
+        ////'#startGreenPolyBtn',
+        //'#submitPolyBtn',
+        //'#startBlackMarkerBtn',
+        //'#startRedMarkerBtn'
+      ],
+      'style' : {color:'grey',fillColor:'LightGrey'}
+    }
+  ));
+
   $('#deletePolyBtn').on('click',function(){
     if ( freeDrawLayer ){
       map.removeLayer(freeDrawLayer);
@@ -776,6 +793,7 @@ var goMakeState = function(){
   $('#deletePolyBtn').hide();
   $('#startBluePolyBtn').show();
   $('#startGreenPolyBtn').show();
+  $('#startGreyPolyBtn').show();
   $('#startBlackMarkerBtn').show();
   $('#startRedMarkerBtn').show();
   $('#submitPolyBtn').hide();
