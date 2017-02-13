@@ -76,11 +76,11 @@ function go(){
   map = new L.Map('map', {
     zoomControl:false,
     center: [0,0], 
-    zoom: 14,
+    zoom: 15,
     editable: true,
     dragging: false,
-    maxZoom: 14,
-    minZoom: 14
+    maxZoom: 15,
+    minZoom: 15
   });
   var baseMaps = {
     "Lagos Island": toner,
