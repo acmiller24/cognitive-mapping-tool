@@ -4,7 +4,8 @@
 var myCities = [  //NAME AND BOUNDS OF CITIES 
   {name:"Boston",bnds:[[42.195649,-71.285258],[42.550992,-70.836535]]}
 ]
-,tblName = "neighborhoods" // cartoDB table name
+,pointTblName = "mapping_output_point" // cartoDB table name (Points)
+,polyTblName = "mapping_output_poly" // cartoDB table name (Polygons)
 ,usrName = "telegul" // your cartoDB username
 ,brandText = "Cognitive Mapping BETA" // top left text and link on site
 ,brandLink = "http://mit.edu" //top left link on site
@@ -360,7 +361,7 @@ function insertDataDirectly() {
   //sql
   //cartodb_id,the_geom,flag,nbrhd_yrs,city_yrs,city,description,name,loved,updated_at,created_at
   
-  var tableName = tblName + '_point';
+  var tableName = pointTblName; //tblName + '_point';
   for (i=0, arrLen = separatedFeatures.markers.length; i < arrLen; i++) {
     var marker = separatedFeatures.markers[i]/*,
         coords = "ST_SetSRID(ST_GeomFromGeoJSON('"
@@ -384,7 +385,7 @@ function insertDataDirectly() {
     );
   }
 
-  var tableName = tblName;
+  var tableName = polyTblName; //tblName;
   for (i=0, arrLen = separatedFeatures.polygons.length; i < arrLen; i++) {
     var poly = separatedFeatures.polygons[i],
         latLngs = poly.getLatLngs();
