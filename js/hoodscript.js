@@ -7,6 +7,7 @@ var myCities = [  //NAME AND BOUNDS OF CITIES
 ,pointTblName = "mapping_output_point" // cartoDB table name (Points)
 ,polyTblName = "mapping_output_poly" // cartoDB table name (Polygons)
 ,usrName = "telegul" // your cartoDB username
+,api_key = '53a689c5c6b10eecd583caeaa5f7b212c436e9b8' // your cartoDB API key (only for backendless)
 ,brandText = "Cognitive Mapping BETA" // top left text and link on site
 ,brandLink = "http://mit.edu" //top left link on site
 ,giturl = "https://github.com/enam/neighborhoods" //Only change this if you want to link to a fork you made, otherwise you can leave the link to the original repo
@@ -261,11 +262,11 @@ function go(){
     $('.typeahead').unbind();*/
 
     //insertDataThroughPhp();
-    insertDataDirectly(buildCartoDBQuery_v2);
+    insertDataDirectly_v2(buildCartoDBQuery_v2);
    
     editModeActivated = false;
     getRidOfDrawnItems();
-    showAlert("Done!","Your poll has been saved!");
+    //showAlert("Done!","Your poll has been saved!");
     askForRespondentId(false);
   });
   $(".cty-group > button.btn").on("click", function(){
@@ -279,7 +280,6 @@ function go(){
   });
   $("#startMappingBtn").click(function(e){
     respondentId = document.getElementById('respondentId').value;
-    document.getElementById('respondentId').value= '';
   });
   
   $("#allSubmitBtn").click(function(e){
@@ -359,7 +359,6 @@ function insertDataThroughPhp() {
 function insertDataDirectly_v2(queryBuilder) {
   var separatedFeatures = separateDrawnItems();
   var url = 'https://' + usrName + '.carto.com/api/v2/sql';
-  var api_key = '53a689c5c6b10eecd583caeaa5f7b212c436e9b8';
 
   var userId = (respondentId.replace(/'/g,"''")).replace(/"/g,"''");
   
@@ -369,7 +368,7 @@ function insertDataDirectly_v2(queryBuilder) {
     $.post(
       url,
       { 
-        'q' : queryBuilder.apply(
+        'q' : queryBuilder.call(
                 null,
                 tableName,
                 '{"type":"Point","coordinates":' + '[' + marker.getLatLng().lng + ',' + marker.getLatLng().lat + ']' + '}',
@@ -397,7 +396,7 @@ function insertDataDirectly_v2(queryBuilder) {
     $.post(
       url,
       { 
-        'q' : queryBuilder.apply(
+        'q' : queryBuilder.call(
                 null,
                 tableName,
                 '{"type":"MultiPolygon","coordinates":[[[' + coords + ']]]}',
@@ -415,7 +414,6 @@ function insertDataDirectly_v2(queryBuilder) {
 function insertDataDirectly() {
   var separatedFeatures = separateDrawnItems();
   var url = 'https://' + usrName + '.carto.com/api/v2/sql';
-  var api_key = '53a689c5c6b10eecd583caeaa5f7b212c436e9b8';
 
   var city = currentCity,
       description = (currentDescription.replace(/'/g,"''")).replace(/"/g,"''"),
@@ -518,7 +516,7 @@ function buildCartoDBQuery_v2(tableName, the_geom, user_id, geom_color) {
   resArray.push( user_id );
   resArray.push( "','");
   resArray.push( geom_color );
-  resArray.push( ")" );
+  resArray.push( "')" );
   //resArray.push( ')' );
   
   return resArray.join('');
@@ -550,6 +548,7 @@ function askForRespondentId(setHandlers) {
     });
     modal.on('hidden.bs.modal',function(){
       if ( $('body').hasClass('make') ) showInstructions();
+      document.getElementById('respondentId').value= '';
     });
   }
 }
