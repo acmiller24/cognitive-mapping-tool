@@ -25,13 +25,13 @@ This project is designed to collect boundaries and descriptions of neighborhoods
 
 2. Change the configuration settings in the top bit of [hoodscript.js](https://github.com/enam/neighborhoods/blob/master/js/hoodscript.js).
 
-3. Update the API key and such in [cartodbProxy.php](https://github.com/enam/neighborhoods/blob/master/php/cartodbProxy.php). AND move this file somewhere above your web root.
+3. Set up WordPress according to the hosting provider requirements. 
 
-4. Update the include path in [add.php](https://github.com/enam/neighborhoods/blob/master/php/add.php), [flag.php](https://github.com/enam/neighborhoods/blob/master/php/flag.php), and [heart.php](https://github.com/enam/neighborhoods/blob/master/php/heart.php) for wherever you put cartodbProxy.php on your server.
+4. Add user(s) to WordPress ( yourdomain.com/wp-admin/users.php )
 
-5. Change [googleanalytics.js](https://github.com/enam/neighborhoods/blob/master/js/googleanalytics.js) to use your analytics code if you want, or remove the script that includes it from line 215 of [index.html](https://github.com/enam/neighborhoods/blob/master/index.html). 
+5. Deploy this project to /www/cognitive-mapping-tool
 
-6. Grab a beer. Don't know if you have a brewery nearby? Check [here](http://nickmartinelli.com) :)  
+6. Enjoy yourdomain.com/cognitive-mapping-tool
 
 ###Thanks!
 ###These are the things in the toolbox. 
