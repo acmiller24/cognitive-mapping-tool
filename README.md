@@ -21,7 +21,7 @@ This project is designed to collect boundaries and descriptions of neighborhoods
 ###Steps to Configure 
 
 1. Create a [CartoDB](http://cartodb.com/) account. 
- 	-add a table. ~~ easiest ~~ One way would be to dowload the shapefile from the [Live Site](http://pnwmaps.com/neighborhoods), add it to your cartoDB account, and empty it. That way you would get the field names and data types rolled right over. However a couple items need updating. The "description" field gets imported as "descriptio" with no "n". Needs updating in the cartodb table. Also, the "flag" field needs data type changed back to boolean. Not really sure why it doesn't import correctly...but there it is.  
+ 	-add a table. ~~ easiest ~~ One way would be add 'mapping_output_point.csv' and 'mapping_output_poly.csv' from /db_templates to your cartoDB account (https://your-CartoDB-accout.carto.com/dashboard/datasets , button 'New Dataset').
 
 2. Change the configuration settings in the top bit of [hoodscript.js](https://github.com/enam/neighborhoods/blob/master/js/hoodscript.js).
 
