@@ -276,7 +276,5 @@ require_once("wp-authenticate.php");
 <?php else: ?>
 	<p>you should autorize</p>
 <?php endif; ?>
-<p>Welcome <?php echo $user->user_firstname . " " . $user->user_lastname; ?></p>
-<p><a href="/control-panel/login.php?logout=true">Click here to log out</a></p>
 </body>
 </html>

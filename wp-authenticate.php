@@ -26,7 +26,7 @@ function authenticate()
       unset($_SESSION["return_to"]);
       header("location: $url");
    else:
-      header("location: /control-panel/");
+      header("location: /cognitive-mapping-tool/");
    endif;
 }
 
@@ -36,7 +36,7 @@ function login()
 
       /*** REMEMBER THE PAGE TO RETURN TO ONCE LOGGED IN ***/      $_SESSION["return_to"] = $_SERVER['REQUEST_URI'];
 
-      /*** REDIRECT TO LOGIN PAGE ***/      header("location: /control-panel/login.php");
+      /*** REDIRECT TO LOGIN PAGE ***/      header("location: /cognitive-mapping-tool/login.php");
 
    endif;
 }
