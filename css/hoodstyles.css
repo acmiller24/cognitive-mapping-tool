@@ -255,7 +255,8 @@ a:hover {
   margin-top: 3px;
 }
 
-.bg-black { background-color: grey; }
+.bg-black { background-color: black; }
+.bg-grey { background-color: grey; }
 .bg-red { background-color: red; }
 .bg-blue { background-color: blue; }
 .bg-green { background-color: green; }
