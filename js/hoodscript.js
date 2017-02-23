@@ -2,17 +2,17 @@
 ----- Config Vars: Change these to configure for your city or cities-------------
 ---------------------------*/
 var myCities = [  //NAME AND BOUNDS OF CITIES 
-  {name:"Boston",bnds:[[42.195649,-71.285258],[42.550992,-70.836535]]}
+  {name:"Lagos",bnds:[[42.195649,-71.285258],[42.550992,-70.836535]]}
 ]
 ,pointTblName = "mapping_output_point" // cartoDB table name (Points)
 ,polyTblName = "mapping_output_poly" // cartoDB table name (Polygons)
-,usrName = "telegul" // your cartoDB username
-,api_key = '53a689c5c6b10eecd583caeaa5f7b212c436e9b8' // your cartoDB API key (only for backendless)
+,usrName = "acmiller2424" // your cartoDB username
+,api_key = 'ba78d9df38a16fd6ce981d7b4c5a4dc92d631fce' // your cartoDB API key (only for backendless)
 ,brandText = "Cognitive Mapping BETA" // top left text and link on site
 ,brandLink = "http://mit.edu" //top left link on site
 ,giturl = "https://github.com/enam/neighborhoods" //Only change this if you want to link to a fork you made, otherwise you can leave the link to the original repo
 ,twiturl = "https://twitter.com/andrewmiller802" //Links to my twit acct, change it if you want or remove twitter link altogether
-,myPath = "http://telegul.cartodb.com/api/v2"; //this is the root path to your cartoDB instance with the v2 api param
+,myPath = "http://acmiller24.cartodb.com/api/v2"; //this is the root path to your cartoDB instance with the v2 api param
 
 /*---------------------------
 ----- Application Vars -------------
@@ -171,7 +171,7 @@ function go(){
         //'#startBlackMarkerBtn',
         //'#startRedMarkerBtn'
       ],
-      'style' : {color:'green',fillColor:'cyan'}
+      'style' : {color:'green',fillColor:'LightGreen'}
     }
   ));
 
@@ -509,14 +509,15 @@ function buildCartoDBQuery_v2(tableName, the_geom, user_id, geom_color) {
   var resArray = ['INSERT INTO '];
 
   resArray.push( tableName );
-  resArray.push( ' (the_geom, user_id, geom_color)' );
+  resArray.push( ' (the_geom, user_id, geom_color, created_at)' );
   resArray.push( ' VALUES (' );
   resArray.push( "ST_SetSRID(ST_GeomFromGeoJSON('" + the_geom + "'),4326)" );
   resArray.push( ",'");
   resArray.push( user_id );
   resArray.push( "','");
   resArray.push( geom_color );
-  resArray.push( "')" );
+  //resArray.push( "', NOW())" );
+  resArray.push( "', CURRENT_TIMESTAMP)" );
   //resArray.push( ')' );
   
   return resArray.join('');
