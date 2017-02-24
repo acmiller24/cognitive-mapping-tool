@@ -6,8 +6,8 @@ var myCities = [  //NAME AND BOUNDS OF CITIES
 ]
 ,pointTblName = "mapping_output_point" // cartoDB table name (Points)
 ,polyTblName = "mapping_output_poly" // cartoDB table name (Polygons)
-,usrName = "acmiller2424" // your cartoDB username
-,api_key = 'ba78d9df38a16fd6ce981d7b4c5a4dc92d631fce' // your cartoDB API key (only for backendless)
+,usrName = "telegul" // your cartoDB username
+,api_key = '53a689c5c6b10eecd583caeaa5f7b212c436e9b8' // your cartoDB API key (only for backendless)
 ,brandText = "Cognitive Mapping BETA" // top left text and link on site
 ,brandLink = "http://mit.edu" //top left link on site
 ,giturl = "https://github.com/enam/neighborhoods" //Only change this if you want to link to a fork you made, otherwise you can leave the link to the original repo
@@ -262,10 +262,14 @@ function go(){
     $('.typeahead').unbind();*/
 
     //insertDataThroughPhp();
-    insertDataDirectly_v2(buildCartoDBQuery_v2);
+    insertDataDirectly_v2(
+      buildUnitedDBQuery, 
+      function() { showAlert("Done!","Your poll has been saved!"); }
+    );
    
     editModeActivated = false;
     getRidOfDrawnItems();
+    updateUIVisibility();
     //showAlert("Done!","Your poll has been saved!");
     askForRespondentId(false);
   });
@@ -356,59 +360,51 @@ function insertDataThroughPhp() {
   });
 }
 
-function insertDataDirectly_v2(queryBuilder) {
+function insertDataDirectly_v2(queryBuilder, postSuccess) {
   var separatedFeatures = separateDrawnItems();
   var url = 'https://' + usrName + '.carto.com/api/v2/sql';
 
   var userId = (respondentId.replace(/'/g,"''")).replace(/"/g,"''");
   
-  var tableName = pointTblName; //tblName + '_point';
-  for (i=0, arrLen = separatedFeatures.markers.length; i < arrLen; i++) {
-    var marker = separatedFeatures.markers[i];
-    $.post(
-      url,
-      { 
-        'q' : queryBuilder.call(
-                null,
-                tableName,
-                '{"type":"Point","coordinates":' + '[' + marker.getLatLng().lng + ',' + marker.getLatLng().lat + ']' + '}',
-                userId, marker._colorId
-              ), 
-        'api_key' : api_key 
-      }, 
-      function(d) {
-        console.log(d);
-      }
-    );
+  var query = [];
+  if (0 != separatedFeatures.markers.length) {
+    // buildUnitedDBQuery(tableName, user_id, features, geomComposer, colorGetter)
+    query.push( queryBuilder.call(
+      null,
+      pointTblName,
+      userId,
+      separatedFeatures.markers,
+      function(feature) {
+        return '{"type":"Point","coordinates":' 
+          + '[' + feature.getLatLng().lng + ',' 
+          + feature.getLatLng().lat + ']' + '}';
+      },
+      function(feature) { return feature._colorId; }
+    ));
   }
-
-  var tableName = polyTblName; //tblName;
-  for (i=0, arrLen = separatedFeatures.polygons.length; i < arrLen; i++) {
-    var poly = separatedFeatures.polygons[i],
-        latLngs = poly.getLatLngs();
-        coordsArr = [];
-    for (var j = 0; j < latLngs.length; j++) {
-      var lat = (latLngs[i].lat);//.toFixed(4); // rid of rounding that was there for url length issue during dev
-      var lng = (latLngs[i].lng);//.toFixed(4); // rid of rounding that was there for url length issue during dev
-      coordsArr.push('['+lng + ',' + lat+']');
-    }
-    var coords = coordsArr.join(',');
-    $.post(
-      url,
-      { 
-        'q' : queryBuilder.call(
-                null,
-                tableName,
-                '{"type":"MultiPolygon","coordinates":[[[' + coords + ']]]}',
-                userId, poly._colorId
-              ), 
-        'api_key' : api_key 
-      }, 
-      function(d) {
-        console.log(d);
-      }
-    );
+  if (0 != separatedFeatures.polygons.length) {
+    // buildUnitedDBQuery(tableName, user_id, features, geomComposer, colorGetter)
+    query.push( queryBuilder.call(
+      null,
+      polyTblName,
+      userId,
+      separatedFeatures.polygons,
+      function(feature) {
+        var latLngs = feature.getLatLngs();
+          coordsArr = [];
+        for (var j = 0; j < latLngs.length; j++) {
+          var lat = (latLngs[j].lat);//.toFixed(4); // rid of rounding that was there for url length issue during dev
+          var lng = (latLngs[j].lng);//.toFixed(4); // rid of rounding that was there for url length issue during dev
+          coordsArr.push('['+lng + ',' + lat+']');
+        }
+        var coords = coordsArr.join(',');
+        return '{"type":"MultiPolygon","coordinates":[[[' + coords + ']]]}';
+      },
+      function(feature) { return feature._colorId; }
+    ));
   }
+  
+  $.post( url, { 'q' : query.join('; '), 'api_key' : api_key }, postSuccess );
 }
 
 function insertDataDirectly() {
@@ -519,6 +515,33 @@ function buildCartoDBQuery_v2(tableName, the_geom, user_id, geom_color) {
   //resArray.push( "', NOW())" );
   resArray.push( "', CURRENT_TIMESTAMP)" );
   //resArray.push( ')' );
+  
+  return resArray.join('');
+}
+
+/* build united query per a table*/
+function buildUnitedDBQuery(tableName, user_id, features, geomComposer, colorGetter) {
+  var resArray = ['INSERT INTO '];
+
+  resArray.push( tableName );
+  resArray.push( ' (the_geom, user_id, geom_color, created_at)' );
+  resArray.push( ' VALUES ' );
+  var values = [];
+  for (var i=0, arrLen = features.length; i < arrLen; i++) {
+    var feature = features[i],
+      the_geom = geomComposer.call( null, feature),
+      geom_color = colorGetter.call( null, feature),
+      value = [];
+    value.push( "(ST_SetSRID(ST_GeomFromGeoJSON('" + the_geom + "'),4326)" );
+    value.push( ",'");
+    value.push( user_id );
+    value.push( "','");
+    value.push( geom_color );
+    //resArray.push( "', NOW())" );
+    value.push( "', CURRENT_TIMESTAMP)" );
+    values.push( value.join('') );
+  }
+  resArray.push( values.join(',') );
   
   return resArray.join('');
 }
