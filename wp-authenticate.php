@@ -47,7 +47,7 @@ function init()
       session_start();
 
    /*** LOADING WORDPRESS LIBRARIES ***/   define('WP_USE_THEMES', false);
-   require_once("../wp-load.php");
+   require_once( dirname(dirname(__FILE__)) . '/wp-load.php' );
 }
 
 ?>

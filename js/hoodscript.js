@@ -6,8 +6,8 @@ var myCities = [  //NAME AND BOUNDS OF CITIES
 ]
 ,pointTblName = "mapping_output_point" // cartoDB table name (Points)
 ,polyTblName = "mapping_output_poly" // cartoDB table name (Polygons)
-,usrName = "telegul" // your cartoDB username
-,api_key = '53a689c5c6b10eecd583caeaa5f7b212c436e9b8' // your cartoDB API key (only for backendless)
+,usrName = "acmiller24" // your cartoDB username
+,api_key = 'ba78d9df38a16fd6ce981d7b4c5a4dc92d631fce' // your cartoDB API key (only for backendless)
 ,brandText = "Cognitive Mapping BETA" // top left text and link on site
 ,brandLink = "http://mit.edu" //top left link on site
 ,giturl = "https://github.com/enam/neighborhoods" //Only change this if you want to link to a fork you made, otherwise you can leave the link to the original repo
@@ -262,9 +262,11 @@ function go(){
     $('.typeahead').unbind();*/
 
     //insertDataThroughPhp();
-    insertDataDirectly_v2(
+    //insertDataDirectly_v2(
+    insertDataThroughProxy(
       buildUnitedDBQuery, 
-      function() { showAlert("Done!","Your poll has been saved!"); }
+      //function() { showAlert("Done!","Your poll has been saved!"); }
+      function() { ; }
     );
    
     editModeActivated = false;
@@ -405,6 +407,53 @@ function insertDataDirectly_v2(queryBuilder, postSuccess) {
   }
   
   $.post( url, { 'q' : query.join('; '), 'api_key' : api_key }, postSuccess );
+}
+
+function insertDataThroughProxy(queryBuilder, postSuccess) {
+  var separatedFeatures = separateDrawnItems();
+  var url = 'https://' + usrName + '.carto.com/api/v2/sql';
+
+  var userId = (respondentId.replace(/'/g,"''")).replace(/"/g,"''");
+  
+  var query = [];
+  if (0 != separatedFeatures.markers.length) {
+    // buildUnitedDBQuery(tableName, user_id, features, geomComposer, colorGetter)
+    query.push( queryBuilder.call(
+      null,
+      pointTblName,
+      userId,
+      separatedFeatures.markers,
+      function(feature) {
+        return '{"type":"Point","coordinates":' 
+          + '[' + feature.getLatLng().lng + ',' 
+          + feature.getLatLng().lat + ']' + '}';
+      },
+      function(feature) { return feature._colorId; }
+    ));
+  }
+  if (0 != separatedFeatures.polygons.length) {
+    // buildUnitedDBQuery(tableName, user_id, features, geomComposer, colorGetter)
+    query.push( queryBuilder.call(
+      null,
+      polyTblName,
+      userId,
+      separatedFeatures.polygons,
+      function(feature) {
+        var latLngs = feature.getLatLngs();
+          coordsArr = [];
+        for (var j = 0; j < latLngs.length; j++) {
+          var lat = (latLngs[j].lat);//.toFixed(4); // rid of rounding that was there for url length issue during dev
+          var lng = (latLngs[j].lng);//.toFixed(4); // rid of rounding that was there for url length issue during dev
+          coordsArr.push('['+lng + ',' + lat+']');
+        }
+        var coords = coordsArr.join(',');
+        return '{"type":"MultiPolygon","coordinates":[[[' + coords + ']]]}';
+      },
+      function(feature) { return feature._colorId; }
+    ));
+  }
+  
+  $.post( "php/cartodbProxy.php", { 'q' : query.join('; ') }, postSuccess );
 }
 
 function insertDataDirectly() {
