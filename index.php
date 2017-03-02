@@ -2,7 +2,8 @@
 /*** PREVENT THE PAGE FROM BEING CACHED BY THE WEB BROWSER ***/header("Cache-Control: no-cache, must-revalidate");
 header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
 
-require_once("wp-authenticate.php");
+//echo dirname(__FILE__) . "/wp-authenticate.php";
+require_once(dirname(__FILE__) . "/wp-authenticate.php");
 
 /*** REQUIRE USER AUTHENTICATION ***/login();
 

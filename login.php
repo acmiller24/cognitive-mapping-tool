@@ -2,7 +2,7 @@
 /*** PREVENT THE PAGE FROM BEING CACHED BY THE WEB BROWSER ***/header("Cache-Control: no-cache, must-revalidate");
 header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
 
-require_once("wp-authenticate.php");
+require_once(dirname(__FILE__) . "/wp-authenticate.php");
 
 /*** LOG OUT CURRENT USER ***/if($_GET['logout'] == 'true')
    wp_logout();
@@ -14,7 +14,7 @@ require_once("wp-authenticate.php");
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <title>Control Panel</title>
+   <title>Login</title>
 </head>
 <body>
 <form action="login.php" method="post">
